@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daki - Control Panel</title>
+    <link rel="stylesheet" href="/dist/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type="module" src="./bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="module" src="/dist/js/index.js" defer></script>
+</head>
+
+<body>
+    <main class="container">
+        <header class="page-header center">
+            <h4>Daki - Control Panel<span class="small-text">by mopsfl</span></h4>
+            <div class="divider"></div>
+        </header>
+
+        <div class="panels container center">
+            <div class="setup-panel panel hide">
+                <h5 class="panel-title">Setup</h5>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="input-field">
+                            <label for="input_setup_api_key">API Key</label>
+                            <input class="white-text" type="password" name="input_setup_api_key" placeholder="ptlc_umG...ar3" id="input_setup_api_key" value="ptlc_GumQT4gD3raM3p6CriqQQqL3Vz0DGtrLczVZjcbxbc3">
+                        </div>
+                        <button class="white-text btn waves-effect waves-light green cursorpointer right" type="submit" name="submit_input_setup" id="submit_input_setup" value="SAVE">CONNECT</button>
+                    </div>
+                </div>
+            </div>
+            <div class="servers-panel hide">
+                <template class="server-item-template">
+                    <div class="server-item">
+                        <div class="server-item-header">
+                            <p class="server-item-name">N/A</p>
+                            <span class="server-item-status pulse"></span>
+                        </div>
+                        <div class="server-item-body">
+                            <p>body</p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>
