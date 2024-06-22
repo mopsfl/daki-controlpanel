@@ -1,5 +1,3 @@
-// APIKEY: ptlc_GumQT4gD3raM3p6CriqQQqL3Vz0DGtrLczVZjcbxbc3
-
 import self from "./Api"
 import Panel from "./Panel"
 import Request from "./Request"
