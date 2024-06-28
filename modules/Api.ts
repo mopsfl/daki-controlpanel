@@ -1,11 +1,14 @@
 import self from "./Api"
+import FormatBytes from "./FormatBytes"
+import LocalStorage from "./LocalStorage"
 import Panel from "./Panel"
 import Request from "./Request"
 import Setup, { _input_setup_api_key, _setup_panel, _submit_input_setup } from "./Setup"
+import TimeAgo from "./Time"
 
 let apiKey = undefined
 
-const DAKI_HOST = "portal.daki.cc"
+const DAKI_HOST = "https://portal.daki.cc"
 const DAKI_API_URL = "https://portal.daki.cc/api/"
 const DAKI_API_ENDPOINTS = {
     ListServers: `${DAKI_API_URL}client`,
@@ -20,7 +23,6 @@ export default {
         if (apiKey !== undefined) return console.warn("Api already connected.")
         apiKey = _apiKey
 
-
         Request.new(DAKI_API_ENDPOINTS.ListServers, "GET", {}, undefined, apiKey).then(_res => _res.json()).then((res: ServerList) => {
             if (res.errors) {
                 res.errors.forEach(err => {
@@ -29,19 +31,47 @@ export default {
                     })
                 })
                 Setup.ResetSetupPanel()
+                apiKey = undefined
                 return
             }
             Panel.SetVisible(_setup_panel, false)
             Panel.SetVisible(_servers_panel, true)
 
             res.data?.forEach(_server => {
-                const [serverItem, serverItemName, serverItemBody, serverItemStatus] = self.CreateServerItem(_server, _servers_panel)
+                const [serverItem, serverItemName, serverItemBody, serverItemStatus, serverItemResources] = self.CreateServerItem(_server, _servers_panel)
 
-                self.GetServerResources(_server).then(resource => {
-                    resource.attributes.current_state === "running" ? serverItemStatus.addClass("green") : serverItemStatus.addClass("red")
-                })
+                async function UpdateServerResources(ignoreFocusCheck?: boolean) {
+                    if ((document.visibilityState === "hidden" || !document.hasFocus()) && !ignoreFocusCheck) return
+                    await self.GetServerResources(_server).then(resource => {
+                        const _resources = {
+                            memory_bytes: FormatBytes(resource.attributes.resources.memory_bytes),
+                            disk_bytes: FormatBytes(resource.attributes.resources.disk_bytes),
+                            network_rx_bytes: FormatBytes(resource.attributes.resources.network_rx_bytes),
+                            network_tx_bytes: FormatBytes(resource.attributes.resources.network_tx_bytes),
+                            cpu_absolute: resource.attributes.resources.cpu_absolute + "%",
+                            uptime: TimeAgo((new Date().getTime()) - resource.attributes.resources.uptime, true)
+                        }
+                        resource.attributes.current_state === "running" ? serverItemStatus.addClass("green") : serverItemStatus.addClass("red")
+
+                        serverItemStatus.attr("data-tooltip", "Uptime: " + _resources.uptime)
+                        serverItemResources.children().each((index, element) => {
+                            const _resourceName = $(element).attr("data-resource-name")
+                            $(element).find(".resource-value").text(_resources[_resourceName])
+                            M.Tooltip.init(element)
+                        })
+                    })
+                }
+
+                (async () => {
+                    await UpdateServerResources(true)
+                    setInterval(UpdateServerResources, 10000)
+                })()
             })
+
+            LocalStorage.Set("_dakicontrolpanel", "apikey", apiKey)
         }).catch(err => {
+            apiKey = undefined
+            LocalStorage.Set("_dakicontrolpanel", "apikey", undefined)
             Setup.ResetSetupPanel()
             M.toast({
                 html: err
@@ -53,13 +83,17 @@ export default {
         const serverItem = jQuery(".server-item-template").contents().clone(),
             serverItemName = serverItem.find(".server-item-name"),
             serverItemBody = serverItem.find(".server-item-body"),
-            serverItemStatus = serverItem.find(".server-item-status")
+            serverItemStatus = serverItem.find(".server-item-status"),
+            serverItemResources = serverItem.find(".server-item-resources")
 
         serverItem.appendTo(parent)
         serverItemName.text(server.attributes.name)
+        serverItemName.on("click", () => {
+            console.log("open server", server);
+        })
 
-        serverItemName.on("click", () => serverItemBody.toggleClass("toggled"))
-        return [serverItem, serverItemName, serverItemBody, serverItemStatus]
+        M.Tooltip.init(serverItemStatus)
+        return [serverItem, serverItemName, serverItemBody, serverItemStatus, serverItemResources]
     },
 
     async GetServerResources(server: Server): Promise<ServerResources> {
@@ -67,12 +101,12 @@ export default {
     }
 }
 
-export { _servers_panel }
+export { _servers_panel, DAKI_HOST, DAKI_API_URL, DAKI_API_ENDPOINTS }
 
 export interface ServerList {
     errors: [APIError],
-    object: string,
     data: [Server],
+    object: string,
     meta: {
         pagination: {
             total: number
@@ -96,18 +130,14 @@ export interface ServerResources {
             cpu_absolute: number
             disk_bytes: number
             network_rx_bytes: number
-            network_tx_bytes: number
+            network_tx_bytes: number,
+            uptime: number,
         }
     }
 }
 
 export type ServerState = "starting" | "running" | "offline"
-
-export interface APIError {
-    code: string,
-    status: string,
-    detail: string
-}
+export interface APIError { code: string, status: string, detail: string }
 
 export interface Server {
     object: string,

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./dist/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script type="module" src="./bower_components/jquery/dist/jquery.min.js"></script>
     <script type="module" src="./dist/js/index.js" defer></script>
@@ -19,14 +20,13 @@
             <h4>Daki - Control Panel<span class="small-text">by mopsfl</span></h4>
             <div class="divider"></div>
         </header>
-
         <div class="panels container center">
             <div class="setup-panel panel hide">
                 <h5 class="panel-title">Setup</h5>
                 <div class="panel-body">
                     <div class="row">
                         <div class="input-field">
-                            <label for="input_setup_api_key">API Key</label>
+                            <label for="input_setup_api_key">Daki API Key</label>
                             <input class="white-text" type="password" name="input_setup_api_key" placeholder="ptlc_umG...ar3" id="input_setup_api_key" value="">
                         </div>
                         <button class="white-text btn waves-effect waves-light green cursorpointer right" type="submit" name="submit_input_setup" id="submit_input_setup" value="SAVE">CONNECT</button>
@@ -36,13 +36,13 @@
             <div class="servers-panel hide">
                 <template class="server-item-template">
                     <div class="server-item">
-                        <div class="server-item-header">
-                            <p class="server-item-name">N/A</p>
-                            <span class="server-item-status pulse"></span>
+                        <p class="server-item-name">N/A</p>
+                        <div class="server-item-resources">
+                            <p class="server-resource-item tooltipped" data-resource-name="cpu_absolute" data-tooltip="CPU Load" data-position="left"><span class="material-icons">computer</span><span class="resource-value">N/A</span></p>
+                            <p class="server-resource-item tooltipped" data-resource-name="memory_bytes" data-tooltip="Memory Usage" data-position="left"><span class="material-icons">memory</span><span class="resource-value">N/A</span></p>
+                            <p class="server-resource-item tooltipped" data-resource-name="disk_bytes" data-tooltip="Disk Usage" data-position="right"><span class="material-symbols-outlined">hard_drive</span><span class="resource-value">N/A</span></p>
                         </div>
-                        <div class="server-item-body">
-                            <p>body</p>
-                        </div>
+                        <span class="server-item-status pulse tooltipped" data-tooltip="Uptime: N/A" data-position="right"></span>
                     </div>
                 </template>
             </div>

@@ -1,4 +1,4 @@
-import { APIError } from "./Api"
+import { APIError, DAKI_HOST } from "./Api"
 import self from "./Request"
 
 export default {
@@ -6,6 +6,7 @@ export default {
         if (!url) throw new Error("Unable to create new request. (missing url<string>)")
         if (auth) headers["Authorization"] = self.CreateBearerAuthObject(auth)
         headers["Accept"] = "application/json"
+        headers["access-control-allow-origin"] = DAKI_HOST
 
         return fetch(url, { headers: headers, body: body, method: method })
     },

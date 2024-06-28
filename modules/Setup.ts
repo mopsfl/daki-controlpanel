@@ -2,6 +2,7 @@ import jQuery from "jquery";
 import Panel from "./Panel";
 import self from "./Setup"
 import Api, { _servers_panel } from "./Api";
+import LocalStorage from "./LocalStorage";
 
 const _setup_panel = jQuery(".setup-panel")
 const _input_setup_api_key = jQuery("#input_setup_api_key")
@@ -9,7 +10,13 @@ const _submit_input_setup = jQuery("#submit_input_setup")
 
 export default {
     Init() {
-        Panel.SetVisible(_setup_panel, true)
+        if (!LocalStorage.GetKey("_dakicontrolpanel", "apikey")) {
+            LocalStorage.Create("_dakicontrolpanel", {})
+            Panel.SetVisible(_setup_panel, true)
+        } else {
+            const _dakicontrolpanelApiKey = LocalStorage.GetKey("_dakicontrolpanel", "apikey")
+            Api.Connect(_dakicontrolpanelApiKey);
+        }
 
         _submit_input_setup.on("click", () => {
             const _apiKeyInput = self.GetApiKeyInput().toString()
